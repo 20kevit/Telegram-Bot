@@ -37,29 +37,16 @@ def send_file(update, context, file_name):
         file_id = context.bot_data[file_name]["file_id"]
 
     #call suitable function for each type of file:
-    if(file_type == "video"):
-        m.reply_video(file_id)
-
-    elif(file_type == "animation"):
-        m.reply_animation(file_id)
-
-    elif(file_type == "voice"):
-        m.reply_voice(file_id)
-
-    elif(file_type == "audio"):
-        m.reply_audio(file_id)
-
-    elif(file_type == "document"):
-        m.reply_document(file_id)
-
-    elif(file_type == "videoNote"):
-        m.reply_video_note(file_id)
-
-    elif(file_type == "photo"):
-        m.reply_photo(file_id)
-
-    else:
-        m.reply_text("File Format not Supported")
+    functions = {
+        "video": m.reply_video,
+        "animation": m.reply_animation,
+        "voice": m.reply_voice,
+        "audio":  m.reply_audio,
+        "document": m.reply_document,
+        "videoNote": m.reply_video_note,
+        "photo": m.reply_photo
+    }
+    functions[file_type](file_id)
 
 #creating a list of allowed characters for generating 'file_names'
 char_list = [chr(i) for i in range(48,58)] + [chr(i) for i in range(65,91)] + [chr(i) for i in range(97,123)] #contains: a-z, A-Z, 0-9
@@ -75,7 +62,6 @@ def rand_string(inp_list, n):
         return rand_string(inp_list, n)
     else:
         return result
-
 
 #supported file types:
 file_types = {
@@ -93,7 +79,6 @@ def get_file(update, context):
     #attachment can be a video, voice or etc.
     attachment = update.message.effective_attachment
 
-    
     file_name = rand_string(context.bot_data, 8)
 
     bot_username = 'example_bot' #without @
