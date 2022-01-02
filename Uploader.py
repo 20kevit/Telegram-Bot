@@ -38,6 +38,7 @@ def send_file(update, context, file_name):
     else:
         file_type = context.bot_data[file_name]["type"]
         file_id = context.bot_data[file_name]["file_id"]
+        caption = context.bot_data[file_name]["caption"]
 
     #call suitable function for each type of file:
     functions = {
@@ -49,7 +50,7 @@ def send_file(update, context, file_name):
         "videoNote": m.reply_video_note,
         "photo": m.reply_photo
     }
-    functions[file_type](file_id)
+    functions[file_type](file_id, caption=caption)
 
 #creating a list of allowed characters for generating 'file_names'
 char_list = [chr(i) for i in range(48,58)] + [chr(i) for i in range(65,91)] + [chr(i) for i in range(97,123)] #contains: a-z, A-Z, 0-9
@@ -92,13 +93,13 @@ def get_file(update, context):
         #the last item is in highest quality and vice versa:
         file_id = attachment[-1].file_id
         #saving file information:
-        context.bot_data[file_name] = {"type":"photo", "file_id":file_id}
+        context.bot_data[file_name] = {"type":"photo", "file_id":file_id, "caption":m.caption}
     
     #other types of files:
     elif(type(attachment) in file_types):
         file_type = file_types[type(attachment)]
         file_id = attachment.file_id
-        context.bot_data[file_name] = {"type":file_type, "file_id":file_id}
+        context.bot_data[file_name] = {"type":file_type, "file_id":file_id, "caption":m.caption}
 
     else:
         m.reply_text("File Format not Supported")
