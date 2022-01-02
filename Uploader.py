@@ -1,3 +1,6 @@
+#this is a bot that get a file(video, audio, photo, etc) and give a link
+#everyone can get the file with that link
+
 import logging
 import telegram
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
