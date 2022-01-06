@@ -50,7 +50,16 @@ def send_file(update, context, file_name):
         "videoNote": m.reply_video_note,
         "photo": m.reply_photo
     }
-    functions[file_type](file_id, caption=caption)
+    message = functions[file_type](file_id, caption=caption)
+    
+    #delete sent media after 30 seconds:
+    context.job_queue.run_once(distroy, 30, context={"chat":message.chat_id, "message":message.message_id})
+    
+def distroy(context):
+    data = context.job.context
+    chat_id = data["chat"]
+    message_id = data["message"]
+    context.bot.delete_message(chat_id, message_id)
 
 #creating a list of allowed characters for generating 'file_names'
 char_list = [chr(i) for i in range(48,58)] + [chr(i) for i in range(65,91)] + [chr(i) for i in range(97,123)] #contains: a-z, A-Z, 0-9
