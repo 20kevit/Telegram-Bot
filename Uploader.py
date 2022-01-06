@@ -36,6 +36,8 @@ def send_file(update, context, file_name):
         return
     #file founded:
     else:
+        context.bot_data[file_name]["downloads"] += 1
+        downloads = context.bot_data[file_name]["downloads"]
         file_type = context.bot_data[file_name]["type"]
         file_id = context.bot_data[file_name]["file_id"]
         caption = context.bot_data[file_name]["caption"]
@@ -51,6 +53,9 @@ def send_file(update, context, file_name):
         "photo": m.reply_photo
     }
     message = functions[file_type](file_id, caption=caption)
+    
+    #how many times this media downloaded:
+    m.reply_text(f"downloads: {downloads}")
     
     #delete sent media after 30 seconds:
     context.job_queue.run_once(distroy, 30, context={"chat":message.chat_id, "message":message.message_id})
@@ -102,13 +107,13 @@ def get_file(update, context):
         #the last item is in highest quality and vice versa:
         file_id = attachment[-1].file_id
         #saving file information:
-        context.bot_data[file_name] = {"type":"photo", "file_id":file_id, "caption":m.caption}
+        context.bot_data[file_name] = {"type":"photo", "file_id":file_id, "caption":m.caption, "download":0}
     
     #other types of files:
     elif(type(attachment) in file_types):
         file_type = file_types[type(attachment)]
         file_id = attachment.file_id
-        context.bot_data[file_name] = {"type":file_type, "file_id":file_id, "caption":m.caption}
+        context.bot_data[file_name] = {"type":file_type, "file_id":file_id, "caption":m.caption, "downloads":0}
 
     else:
         m.reply_text("File Format not Supported")
