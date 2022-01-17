@@ -17,6 +17,7 @@ persistence = PicklePersistence(filename='database')
 updater = Updater("BOT TOKEN", persistence=persistence) 
 dp = updater.dispatcher
 
+#------------------------------------------------------------------------------------------------------
 def start(update, context):
     #default setting:
     if(not "setting" in context.user_data):
@@ -36,6 +37,7 @@ def start(update, context):
         #defined function:
         send_file(update, context, file_name)
 
+#------------------------------------------------------------------------------------------------------
 def send_file(update, context, file_name):
     # 'm' treats like a shortcut for 'update.message'
     m = update.message
@@ -85,6 +87,7 @@ def distroy(context):
     message_id = data["message"]
     context.bot.delete_message(chat_id, message_id)
 
+#------------------------------------------------------------------------------------------------------
 #creating a list of allowed characters for generating 'file_names'
 char_list = [chr(i) for i in range(48,58)] + [chr(i) for i in range(65,91)] + [chr(i) for i in range(97,123)] #contains: a-z, A-Z, 0-9
 
@@ -110,6 +113,7 @@ file_types = {
     telegram.files.videonote.VideoNote : "videoNote",
     telegram.files.photosize.PhotoSize : "photo"
 }
+#------------------------------------------------------------------------------------------------------
 def get_file(update, context):
     # 'm' treats like a shortcut for 'update.message'
     m = update.message
@@ -147,6 +151,7 @@ def get_file(update, context):
     m.reply_text("Here you are:")
     m.reply_text(link)
 
+#------------------------------------------------------------------------------------------------------
 #define some states for handling conversation:	
 stt_choose, stt_change_timer = range(2)
 
@@ -246,7 +251,8 @@ conversation_setting = ConversationHandler(
     name="my_login_conversation",
     persistent=True,
 )
-	
+
+#------------------------------------------------------------------------------------------------------
 #adding handlers:
 dp.add_handler(CommandHandler("start", start))
 dp.add_handler(MessageHandler(~Filters.text, get_file))
