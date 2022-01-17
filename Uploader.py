@@ -16,6 +16,14 @@ updater = Updater("BOT TOKEN")
 dp = updater.dispatcher
 
 def start(update, context):
+    #default setting:
+    if(not "setting" in context.user_data):
+        setting = {
+            "public": True,
+            "timer": 0
+        }
+        context.user_data["setting"] = setting
+        
     #normal start:
     if(not context.args):
         update.message.reply_text("send some files, so i will send you a link to acsess file later:")
@@ -29,18 +37,32 @@ def start(update, context):
 def send_file(update, context, file_name):
     # 'm' treats like a shortcut for 'update.message'
     m = update.message
+    
+    #public files:
+    if(file_name in context.bot_data):
+        source = context.bot_data
+    
+    #private files:
+    elif(file_name in context.user_data):
+        source = context.user_data
+
+    #invalid links contain invalid file_names:
+    else:
+        m.reply_text("File Not Found")
+        return
 
     #invalid links contain invalid file_names:
     if(not file_name in context.bot_data):
         m.reply_text("File Not Found")
         return
+    
     #file founded:
-    else:
-        context.bot_data[file_name]["downloads"] += 1
-        downloads = context.bot_data[file_name]["downloads"]
-        file_type = context.bot_data[file_name]["type"]
-        file_id = context.bot_data[file_name]["file_id"]
-        caption = context.bot_data[file_name]["caption"]
+    source[file_name]["downloads"] += 1
+    downloads = source[file_name]["downloads"]
+    file_type = source[file_name]["type"]
+    file_id = source[file_name]["file_id"]
+    caption = source[file_name]["caption"]
+    timer = source[file_name]["timer"]
 
     #call suitable function for each type of file:
     functions = {
@@ -57,8 +79,8 @@ def send_file(update, context, file_name):
     #how many times this media downloaded:
     m.reply_text(f"downloads: {downloads}")
     
-    #delete sent media after 30 seconds:
-    context.job_queue.run_once(distroy, 30, context={"chat":message.chat_id, "message":message.message_id})
+    if(timer > 0)
+    	context.job_queue.run_once(distroy, timer, context={"chat":message.chat_id, "message":message.message_id})
     
 def distroy(context):
     data = context.job.context
@@ -110,11 +132,19 @@ def get_file(update, context):
     if(not type(attachment) in file_types):
         m.reply_text("File Format not Supported")
         return
+		
+    setting = context.user_data["setting"]
+    is_public = setting["public"]
+    timer = setting["timer"]
 
     file_type = file_types[type(attachment)]
     file_id = attachment.file_id
     caption = m.caption
-    context.bot_data[file_name] = {"type":file_type, "file_id":file_id, "caption":caption, "downloads":0}
+	
+	if(is_public):
+    	context.bot_data[file_name] = {"type":file_type, "file_id":file_id, "caption":caption, "timer":timer, "downloads":0}
+	else:
+    	context.user_data[file_name] = {"type":file_type, "file_id":file_id, "caption":caption, "timer":timer, "downloads":0}
     
     #send link to user:
     m.reply_text("Here you are:")
