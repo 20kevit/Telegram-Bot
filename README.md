@@ -1,14 +1,14 @@
 <snippet>
   <content>
     
-## Telegram Bot
-there is some simple example of telegram bots that written with python-telegram-bot module
+## 🤖 Telegram Bot
+there is some <b>simple example</b> of <b>telegram bots</b> that written with python-telegram-bot module
 
-## Usage
+## 🦾 Usage:
 just replace <b>BOT TOKEN</b> with your bot token and run!
-<br>some of projects need more information e.g. bot username.
+<br>note: some of projects need more information e.g. bot username.
 
-## Contributing
+## Contributing:
 1. Fork it!
 2. Create your feature branch: `git checkout -b my-new-feature`
 3. Commit your changes: `git commit -am 'Add some feature'`
