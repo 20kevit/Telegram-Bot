@@ -1,9 +1,10 @@
 #this is a bot that get a file(video, audio, photo, etc) and give a link
-#everyone can get the file with that link
+#everyone can get the file with that link if file is public
 
 import logging
 import telegram
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, PicklePersistence
+from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, PicklePersistence, ConversationHandler
 from random import choice
 
 # Enable logging
@@ -138,17 +139,118 @@ def get_file(update, context):
     caption = m.caption
 	
 	if(is_public):
-    	context.bot_data[file_name] = {"type":file_type, "file_id":file_id, "caption":caption, "timer":timer, "downloads":0}
+    		context.bot_data[file_name] = {"type":file_type, "file_id":file_id, "caption":caption, "timer":timer, "downloads":0}
 	else:
-    	context.user_data[file_name] = {"type":file_type, "file_id":file_id, "caption":caption, "timer":timer, "downloads":0}
+    		context.user_data[file_name] = {"type":file_type, "file_id":file_id, "caption":caption, "timer":timer, "downloads":0}
     
     #send link to user:
     m.reply_text("Here you are:")
     m.reply_text(link)
 
+#define some states for handling conversation:	
+stt_choose, stt_change_timer = range(2)
+
+#this function ends covnersation:
+def cancel(update, context):
+	update.message.reply_text('send your files:', reply_markup=ReplyKeyboardRemove())
+    return ConversationHandler.END
+
+#calls the cancel function when user sends a command or 'end' message or non-text message:
+cancel_handler = MessageHandler(Filters.command | Filters.regex("^end$") | ~Filters.text, cancel)
+
+#execute when user send /setting command:
+def change_setting(update, context):
+	#get current setting:	
+    setting = context.user_data["setting"]
+    timer = setting["timer"]
+    is_public = setting["public"]
+	
+	
+	#show user current setting:
+    txt_reply = "your current setting:\ntype: "
+    txt_reply += "public" if is_public else "private"
+    txt_reply += "\ntimer: "
+    txt_reply += str(timer) if (timer > 0) else "not set"
+    update.message.reply_text(txt_reply)
+	
+	#options:
+    keyboard = ReplyKeyboardMarkup(
+        [["change type", "reset timer"], ["end"]],
+        one_time_keyboard = True,
+        resize_keyboard = True
+    )
+    update.message.reply_text("choose:", reply_markup=keyboard)
+    return stt_choose
+
+#execute when user choose an option:
+def choose(update, context):
+    message = update.message.text
+	
+
+    if(message == "change type"):
+		#inverting public/private situation:
+        value = context.user_data["setting"]["public"]
+        context.user_data["setting"]["public"] = not value
+        update.message.reply_text("done")
+        return change_setting(update, context)
+
+    elif(message == "reset timer"):
+        keyboard = ReplyKeyboardMarkup(
+            [["end"]],
+            one_time_keyboard = True,
+            resize_keyboard = True
+        )
+        update.message.reply_text(
+            "send new value for timer:\n(0 for disable)",
+            reply_markup=keyboard
+        )
+        return stt_change_timer
+
+    else:
+        update.message.reply_text("invalid input")
+        return stt_choose
+
+#set timer to given value:
+def change_timer(update, context):
+    m = update.message
+    timer = m.text
+	
+    try:
+        timer = int(timer)
+        if(timer < 0):
+            m.reply_text("please send an non-negative integer")
+            return stt_change_timer
+
+        else:
+            context.user_data["setting"]["timer"] = timer
+            update.message.reply_text("done")
+            return change_setting(update, context)
+
+    except:
+        m.reply_text("please send an non-negative integer")
+        return stt_change_timer
+
+conversation_setting = ConversationHandler(
+    entry_points = [CommandHandler("setting", change_setting)],
+    states = {
+        stt_choose : [
+            cancel_handler,
+            MessageHandler(Filters.text, choose)
+        ],
+        stt_change_timer : [
+            cancel_handler,
+            MessageHandler(Filters.text, change_timer)
+        ]
+    },
+    fallbacks = [cancel_handler],
+    name="my_login_conversation",
+    persistent=True,
+)
+	
 #adding handlers:
 dp.add_handler(CommandHandler("start", start))
 dp.add_handler(MessageHandler(~Filters.text, get_file))
+dp.add_handler(conversation_setting)
 
 #start bot:
 updater.start_polling()
