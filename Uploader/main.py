@@ -16,6 +16,14 @@ persistence = PicklePersistence(filename='database')
 updater = Updater("BOT TOKEN", persistence=persistence) 
 dp = updater.dispatcher
 
+class File():
+	def __init__(self, Type, file_id, caption, timer):
+        self.Type = Type
+        self.file_id = file_id
+        self.caption = caption
+        self.timer = timer
+        self.downloads = 0
+
 #------------------------------------------------------------------------------------------------------
 def start(update, context):
     #default setting:
@@ -55,12 +63,13 @@ def send_file(update, context, file_name):
         return
     
     #file founded:
-    source[file_name]["downloads"] += 1
-    downloads = source[file_name]["downloads"]
-    file_type = source[file_name]["type"]
-    file_id = source[file_name]["file_id"]
-    caption = source[file_name]["caption"]
-    timer = source[file_name]["timer"]
+	file = source[file_name]
+    file.["downloads"] += 1
+    downloads = file.downloads
+    file_type = file.Type
+    file_id = file.file_id
+    caption = file.caption
+    timer = file.timer
 
     #call suitable function for each type of file:
     functions = {
@@ -141,10 +150,11 @@ def get_file(update, context):
     file_id = attachment.file_id
     caption = m.caption
 	
+	new_file = File(file_type, file_id, caption, timer)
 	if(is_public):
-    		context.bot_data[file_name] = {"type":file_type, "file_id":file_id, "caption":caption, "timer":timer, "downloads":0}
+    		context.bot_data[file_name] = new_file
 	else:
-    		context.user_data[file_name] = {"type":file_type, "file_id":file_id, "caption":caption, "timer":timer, "downloads":0}
+    		context.user_data[file_name] = new_file
     
     #send link to user:
     m.reply_text("Here you are:")
