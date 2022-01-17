@@ -50,11 +50,6 @@ def send_file(update, context, file_name):
     else:
         m.reply_text("File Not Found")
         return
-
-    #invalid links contain invalid file_names:
-    if(not file_name in context.bot_data):
-        m.reply_text("File Not Found")
-        return
     
     #file founded:
     source[file_name]["downloads"] += 1
