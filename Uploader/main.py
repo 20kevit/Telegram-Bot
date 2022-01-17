@@ -2,8 +2,7 @@
 #everyone can get the file with that link if file is public
 
 import logging
-import telegram
-from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove
+from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, files
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, PicklePersistence, ConversationHandler
 from random import choice
 
@@ -105,13 +104,13 @@ def rand_string(inp_list, n):
 
 #supported file types:
 file_types = {
-    telegram.files.video.Video : "video",
-    telegram.files.animation.Animation : "animation",
-    telegram.files.voice.Voice : "voice",
-    telegram.files.audio.Audio : "audio",
-    telegram.files.document.Document : "document",
-    telegram.files.videonote.VideoNote : "videoNote",
-    telegram.files.photosize.PhotoSize : "photo"
+    files.video.Video : "video",
+    files.animation.Animation : "animation",
+    files.voice.Voice : "voice",
+    files.audio.Audio : "audio",
+    files.document.Document : "document",
+    files.videonote.VideoNote : "videoNote",
+    files.photosize.PhotoSize : "photo"
 }
 #------------------------------------------------------------------------------------------------------
 def get_file(update, context):
