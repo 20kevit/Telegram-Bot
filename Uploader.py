@@ -76,7 +76,7 @@ def send_file(update, context, file_name):
     #how many times this media downloaded:
     m.reply_text(f"downloads: {downloads}")
     
-    if(timer > 0)
+    if(timer > 0):
     	context.job_queue.run_once(distroy, timer, context={"chat":message.chat_id, "message":message.message_id})
     
 def distroy(context):
