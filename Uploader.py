@@ -3,7 +3,7 @@
 
 import logging
 import telegram
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, PicklePersistence
 from random import choice
 
 # Enable logging
@@ -12,7 +12,8 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-updater = Updater("BOT TOKEN") 
+persistence = PicklePersistence(filename='database')
+updater = Updater("BOT TOKEN", persistence=persistence) 
 dp = updater.dispatcher
 
 def start(update, context):
