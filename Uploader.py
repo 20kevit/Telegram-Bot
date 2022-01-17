@@ -89,6 +89,7 @@ file_types = {
     telegram.files.audio.Audio : "audio",
     telegram.files.document.Document : "document",
     telegram.files.videonote.VideoNote : "videoNote",
+    telegram.files.photosize.PhotoSize : "photo"
 }
 def get_file(update, context):
     # 'm' treats like a shortcut for 'update.message'
@@ -102,22 +103,18 @@ def get_file(update, context):
     bot_username = 'example_bot' #without @
     link = f"t.me/{bot_username}?start={file_name}"
 
-    #for 'photo' files attachment is a list of photos with different qualities:
-    if(type(attachment) == type([])):
-        #the last item is in highest quality and vice versa:
-        file_id = attachment[-1].file_id
-        #saving file information:
-        context.bot_data[file_name] = {"type":"photo", "file_id":file_id, "caption":m.caption, "download":0}
-    
-    #other types of files:
-    elif(type(attachment) in file_types):
-        file_type = file_types[type(attachment)]
-        file_id = attachment.file_id
-        context.bot_data[file_name] = {"type":file_type, "file_id":file_id, "caption":m.caption, "downloads":0}
-
-    else:
+    #for 'photo' files attachment is a list of photos with different sizes:
+    if(type(attachment) == list):
+        attachment = attachment[-1]
+        
+    if(not type(attachment) in file_types):
         m.reply_text("File Format not Supported")
         return
+
+    file_type = file_types[type(attachment)]
+    file_id = attachment.file_id
+    caption = m.caption
+    context.bot_data[file_name] = {"type":file_type, "file_id":file_id, "caption":caption, "downloads":0}
     
     #send link to user:
     m.reply_text("Here you are:")
