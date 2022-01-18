@@ -17,3 +17,9 @@ simple!
 use `/setting` command to change these features:
 1. <b>public/private:</b>  public files will be avalable for everyone who has the link! but pivate files is avalable just for sender, even who has the link!
 2. <b>timer:</b>  you can set timer for each file, so bot delete media after specified seconds(if you know, you know🤭). zero value means media wont be deleted.
+
+use `/multi` command to save several links in one link!
+1. send command
+2. send some links that looks like: <i>t.me/username_bot?start=XXXXXXXX</i>
+3. send `/pack` command, then bot gives you a new link
+4. or send `/cancel` to cancel!
