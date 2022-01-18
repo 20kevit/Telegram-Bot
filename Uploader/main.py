@@ -129,7 +129,7 @@ def get_file(update, context):
     #attachment can be a video, voice or etc.
     attachment = update.message.effective_attachment
 
-    file_name = rand_string(context.bot_data, 8)
+    file_name = rand_string({**context.bot_data, **context.user_data}, 8)
 
     bot_username = 'example_bot' #without @
     link = f"t.me/{bot_username}?start={file_name}"
