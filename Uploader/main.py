@@ -15,7 +15,8 @@ logger = logging.getLogger(__name__)
 persistence = PicklePersistence(filename='database')
 updater = Updater("BOT TOKEN", persistence=persistence) 
 dp = updater.dispatcher
-
+bot_username = 'example_bot' #without @
+	
 class File():
 	def __init__(self, Type, file_id, caption, timer):
         self.Type = Type
@@ -135,7 +136,6 @@ def get_file(update, context):
 
     file_name = rand_string({**context.bot_data, **context.user_data}, 8)
 
-    bot_username = 'example_bot' #without @
     link = f"t.me/{bot_username}?start={file_name}"
 
     #for 'photo' files attachment is a list of photos with different sizes:
@@ -336,6 +336,7 @@ conversation_multi_file = ConversationHandler(
 dp.add_handler(CommandHandler("start", start))
 dp.add_handler(MessageHandler(~Filters.text, get_file))
 dp.add_handler(conversation_setting)
+dp.add_handler(conversation_multi_file)
 
 #start bot:
 updater.start_polling()
