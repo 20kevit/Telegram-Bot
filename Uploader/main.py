@@ -55,6 +55,10 @@ def send_file(update, context, file_name):
     
     #private files:
     elif(file_name in context.user_data):
+        if(type(context.bot_data[file_name]) == list):
+            for i in context.bot_data[file_name]:
+                send_file(update, context, i)
+            return
         source = context.user_data
 
     #invalid links contain invalid file_names:
@@ -259,6 +263,72 @@ conversation_setting = ConversationHandler(
     fallbacks = [cancel_handler],
     name="my_login_conversation",
     persistent=True,
+)
+#------------------------------------------------------------------------------------------------------
+def cancel2(update, context):
+    #delete cache:
+    if("multi_files" in context.user_data):
+        context.user_data.pop("multi_files")
+
+    update.message.reply_text("canceled")
+    return ConversationHandler.END
+
+def multi_file(update, context):
+    #keep file names in a list:
+    context.user_data["file_names"] = []
+    update.message.reply_text("send your links to pack in a new link:\n\n after all send /pack command, or send /cancel")
+    return "state_get_link"
+
+def add_link(update, context):
+    m = update.message
+    #m.text should be like this: t.me/bot_username?start=something
+    file_name = m.text.split("=")[-1] # new_file_nama = something
+    if(file_name in context.bot_data):
+        context.user_data["file_names"].append(file_name)
+        m.reply_text("done!")
+        m.reply_text("send next:")
+    else:
+        m.reply_text("invalid link!")
+
+    return "state_get_link"
+
+#calls when user send /pack commnad:
+def pack_files(update, context):
+    m = update.message
+
+    links = context.user_data["file_names"]
+
+    #if it is empty or just contain 1 link:
+    if(len(links) < 2):
+        m.reply_text("you should add at least 2 links!")
+        return "state_get_link"
+
+    #generate a name that points to a list contains some file names
+    list_name = rand_string(context.bot_data, 8)
+    context.bot_data[list_name] = links
+
+    #delete cache
+    context.user_data.pop("file_names")
+
+    link = f"t.me/{bot_username}?start={list_name}"
+
+    #send link to user:
+    m.reply_text("Here you are:")
+    m.reply_text(link)
+
+    return ConversationHandler.END
+
+
+conversation_multi_file = ConversationHandler(
+    entry_points = [CommandHandler("multi", multi_file)],
+    states = {
+        "state_get_link" : [
+            CommandHandler("cancel", cancel2),
+            CommandHandler("pack", pack_files),
+            MessageHandler(Filters.text, add_link)
+        ]
+    },
+    fallbacks = [CommandHandler("cancel", cancel2)],
 )
 
 #------------------------------------------------------------------------------------------------------
