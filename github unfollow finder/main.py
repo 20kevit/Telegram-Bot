@@ -10,7 +10,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-updater = Updater("5002794464:AAGGCcGh9JSodZF90ASn6mS7Zbc6qm7fJrs") 
+updater = Updater("BOT TOKEN") 
 dp = updater.dispatcher
 
 
