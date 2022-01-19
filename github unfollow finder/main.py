@@ -73,9 +73,6 @@ def answer(update, context):
         txt_reply += f"\n- [{person}](https://github.com/{person})"
     m.reply_text(txt_reply, parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True)
     
-    
-    print(str(update.effective_user.id), " -> ", str(m.text))
-    
 dp.add_handler(MessageHandler(Filters.text, answer))
 
 updater.start_polling()
